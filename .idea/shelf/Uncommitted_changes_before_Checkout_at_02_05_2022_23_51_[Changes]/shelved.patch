@@ -1,0 +1,266 @@
+Index: src/main/java/ru/learnUp/market/dao/repository/AuthorRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.repository;\r\n\r\nimport org.springframework.data.jpa.repository.JpaRepository;\r\nimport org.springframework.stereotype.Repository;\r\nimport ru.learnUp.market.dao.entity.Author;\r\n\r\n@Repository\r\npublic interface AuthorRepository extends JpaRepository<Author, Long> {\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/repository/AuthorRepository.java b/src/main/java/ru/learnUp/market/dao/repository/AuthorRepository.java
+--- a/src/main/java/ru/learnUp/market/dao/repository/AuthorRepository.java	
++++ b/src/main/java/ru/learnUp/market/dao/repository/AuthorRepository.java	
+@@ -1,10 +1,13 @@
+ package ru.learnUp.market.dao.repository;
+ 
+ import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
+ import org.springframework.stereotype.Repository;
+ import ru.learnUp.market.dao.entity.Author;
+ 
+ @Repository
+ public interface AuthorRepository extends JpaRepository<Author, Long> {
+ 
++    @Query(value = "from Author a join fetch a.books where a.authorId = :id")
++    Author findId(Long id);
+ }
+Index: src/main/java/ru/learnUp/market/dao/entity/Book.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.entity;\r\n\r\nimport lombok.*;\r\nimport org.hibernate.Hibernate;\r\n\r\nimport javax.persistence.*;\r\nimport java.util.List;\r\nimport java.util.Objects;\r\n\r\n@Entity\r\n@Table\r\n@Getter\r\n@Setter\r\n@ToString(exclude = \"author\")\r\n@RequiredArgsConstructor\r\npublic class Book {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long bookId;\r\n\r\n    @ManyToOne\r\n    @JoinColumn\r\n    private Author author;\r\n\r\n    @Column\r\n    private String bookName;\r\n\r\n    @Column\r\n    private int issueDate;\r\n\r\n    @Column\r\n    private int leavesCount;\r\n\r\n    @Column\r\n    private int price;\r\n\r\n    @OneToMany(mappedBy = \"book\", fetch = FetchType.EAGER, cascade = CascadeType.ALL)\r\n    private List<BookStorage> bookStorage;\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/entity/Book.java b/src/main/java/ru/learnUp/market/dao/entity/Book.java
+--- a/src/main/java/ru/learnUp/market/dao/entity/Book.java	
++++ b/src/main/java/ru/learnUp/market/dao/entity/Book.java	
+@@ -1,11 +1,12 @@
+ package ru.learnUp.market.dao.entity;
+ 
+ import lombok.*;
+-import org.hibernate.Hibernate;
++import org.hibernate.annotations.Fetch;
++import org.hibernate.annotations.FetchMode;
+ 
+ import javax.persistence.*;
++import java.io.Serializable;
+ import java.util.List;
+-import java.util.Objects;
+ 
+ @Entity
+ @Table
+@@ -13,7 +14,7 @@
+ @Setter
+ @ToString(exclude = "author")
+ @RequiredArgsConstructor
+-public class Book {
++public class Book implements Serializable {
+ 
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+@@ -21,6 +22,7 @@
+ 
+     @ManyToOne
+     @JoinColumn
++    @Fetch(FetchMode.JOIN)
+     private Author author;
+ 
+     @Column
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <modelVersion>4.0.0</modelVersion>\r\n    <parent>\r\n        <groupId>org.springframework.boot</groupId>\r\n        <artifactId>spring-boot-starter-parent</artifactId>\r\n        <version>2.6.6</version>\r\n        <relativePath/> <!-- lookup parent from repository -->\r\n    </parent>\r\n\r\n    <groupId>ru.learnUp.market</groupId>\r\n    <artifactId>BooksMarket</artifactId>\r\n    <version>1</version>\r\n\r\n    <properties>\r\n        <maven.compiler.source>17</maven.compiler.source>\r\n        <maven.compiler.target>17</maven.compiler.target>\r\n    </properties>\r\n\r\n    <dependencies>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-jdbc</artifactId>\r\n        </dependency>\r\n\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter</artifactId>\r\n        </dependency>\r\n\r\n        <dependency>\r\n            <groupId>org.projectlombok</groupId>\r\n            <artifactId>lombok</artifactId>\r\n            <optional>true</optional>\r\n        </dependency>\r\n\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-test</artifactId>\r\n            <scope>test</scope>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>org.springframework.boot</groupId>\r\n            <artifactId>spring-boot-starter-data-jpa</artifactId>\r\n        </dependency>\r\n\r\n        <dependency>\r\n        <groupId>org.postgresql</groupId>\r\n        <artifactId>postgresql</artifactId>\r\n        </dependency>\r\n    </dependencies>\r\n\r\n    <build>\r\n        <plugins>\r\n            <plugin>\r\n                <groupId>org.springframework.boot</groupId>\r\n                <artifactId>spring-boot-maven-plugin</artifactId>\r\n                <configuration>\r\n                    <excludes>\r\n                        <exclude>\r\n                            <groupId>org.project-lombok</groupId>\r\n                            <artifactId>lombok</artifactId>\r\n                        </exclude>\r\n                    </excludes>\r\n                </configuration>\r\n            </plugin>\r\n        </plugins>\r\n    </build>\r\n\r\n</project>
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	
++++ b/pom.xml	
+@@ -30,6 +30,22 @@
+             <artifactId>spring-boot-starter</artifactId>
+         </dependency>
+ 
++<!--        <dependency>-->
++<!--            <groupId>org.springframework.boot</groupId>-->
++<!--            <artifactId>spring-boot-starter-cache</artifactId>-->
++<!--        </dependency>-->
++
++<!--        <dependency>-->
++<!--            <groupId>org.springframework.boot</groupId>-->
++<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
++<!--        </dependency>-->
++
++        <dependency>
++            <groupId>org.hibernate</groupId>
++            <artifactId>hibernate-validator</artifactId>
++            <version>7.0.4.Final</version>
++        </dependency>
++
+         <dependency>
+             <groupId>org.projectlombok</groupId>
+             <artifactId>lombok</artifactId>
+Index: src/main/java/ru/learnUp/market/dao/entity/Author.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.entity;\r\n\r\nimport lombok.*;\r\nimport org.hibernate.Hibernate;\r\n\r\nimport javax.persistence.*;\r\nimport java.util.List;\r\nimport java.util.Objects;\r\n\r\n@Entity\r\n@Table\r\n@Getter\r\n@Setter\r\n@ToString\r\n@RequiredArgsConstructor\r\npublic class Author {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long authorId;\r\n\r\n    @Column\r\n    private String authorName;\r\n\r\n    @Column\r\n    private String authorSurname;\r\n\r\n    @OneToMany(mappedBy = \"author\", fetch = FetchType.EAGER, cascade = CascadeType.ALL)\r\n    private List<Book> books;\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/entity/Author.java b/src/main/java/ru/learnUp/market/dao/entity/Author.java
+--- a/src/main/java/ru/learnUp/market/dao/entity/Author.java	
++++ b/src/main/java/ru/learnUp/market/dao/entity/Author.java	
+@@ -1,11 +1,14 @@
+ package ru.learnUp.market.dao.entity;
+ 
+ import lombok.*;
+-import org.hibernate.Hibernate;
++import org.hibernate.annotations.Fetch;
++import org.hibernate.annotations.FetchMode;
++import org.hibernate.annotations.OnDelete;
++import org.hibernate.annotations.OnDeleteAction;
+ 
+ import javax.persistence.*;
++import java.io.Serializable;
+ import java.util.List;
+-import java.util.Objects;
+ 
+ @Entity
+ @Table
+@@ -13,7 +16,7 @@
+ @Setter
+ @ToString
+ @RequiredArgsConstructor
+-public class Author {
++public class Author implements Serializable {
+ 
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+@@ -26,6 +29,8 @@
+     private String authorSurname;
+ 
+     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
++    @OnDelete(action = OnDeleteAction.CASCADE)
++    @Fetch(FetchMode.JOIN)
+     private List<Book> books;
+ 
+ }
+Index: src/main/java/ru/learnUp/market/dao/entity/BooksOrder.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.entity;\r\n\r\nimport lombok.*;\r\nimport org.hibernate.Hibernate;\r\n\r\nimport javax.persistence.*;\r\nimport java.util.List;\r\nimport java.util.Objects;\r\n\r\n@Entity\r\n@Table(name = \"books_order\")\r\n@Getter\r\n@Setter\r\n@ToString\r\n@RequiredArgsConstructor\r\npublic class BooksOrder {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long orderId;\r\n\r\n    @OneToOne\r\n    @JoinColumn\r\n    private Customer customer;\r\n\r\n    @Column\r\n    private int finalPrice;\r\n\r\n    @OneToMany\r\n    private List<OrderDetails> listOfOrderDetails;\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/entity/BooksOrder.java b/src/main/java/ru/learnUp/market/dao/entity/BooksOrder.java
+--- a/src/main/java/ru/learnUp/market/dao/entity/BooksOrder.java	
++++ b/src/main/java/ru/learnUp/market/dao/entity/BooksOrder.java	
+@@ -1,17 +1,14 @@
+ package ru.learnUp.market.dao.entity;
+ 
+ import lombok.*;
+-import org.hibernate.Hibernate;
+ 
+ import javax.persistence.*;
+ import java.util.List;
+-import java.util.Objects;
+ 
+ @Entity
+ @Table(name = "books_order")
+ @Getter
+ @Setter
+-@ToString
+ @RequiredArgsConstructor
+ public class BooksOrder {
+ 
+Index: src/main/java/ru/learnUp/market/dao/service/AuthorService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.service;\r\n\r\nimport org.springframework.stereotype.Repository;\r\nimport ru.learnUp.market.dao.entity.Author;\r\nimport ru.learnUp.market.dao.repository.AuthorRepository;\r\n\r\nimport java.util.List;\r\n\r\n@Repository\r\npublic class AuthorService {\r\n    private final AuthorRepository authorRepository;\r\n\r\n    public AuthorService(AuthorRepository author, AuthorRepository authorRepository) {\r\n        this.authorRepository = authorRepository;\r\n    }\r\n\r\n    public Author createAuthor(Author author) {\r\n        return authorRepository.save(author);\r\n    }\r\n\r\n    public List<Author> getAuthors (){\r\n        return authorRepository.findAll();\r\n    }\r\n\r\n    public Author getAuthorId(Long id){\r\n        return authorRepository.getById(id);\r\n    }\r\n\r\n}\r\n\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/service/AuthorService.java b/src/main/java/ru/learnUp/market/dao/service/AuthorService.java
+--- a/src/main/java/ru/learnUp/market/dao/service/AuthorService.java	
++++ b/src/main/java/ru/learnUp/market/dao/service/AuthorService.java	
+@@ -1,12 +1,12 @@
+ package ru.learnUp.market.dao.service;
+ 
+-import org.springframework.stereotype.Repository;
++import org.springframework.stereotype.Service;
+ import ru.learnUp.market.dao.entity.Author;
+ import ru.learnUp.market.dao.repository.AuthorRepository;
+ 
+ import java.util.List;
+ 
+-@Repository
++@Service
+ public class AuthorService {
+     private final AuthorRepository authorRepository;
+ 
+@@ -23,7 +23,7 @@
+     }
+ 
+     public Author getAuthorId(Long id){
+-        return authorRepository.getById(id);
++        return authorRepository.findId(id);
+     }
+ 
+ }
+Index: src/main/java/ru/learnUp/market/dao/service/BookService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market.dao.service;\r\n\r\nimport org.springframework.stereotype.Service;\r\nimport ru.learnUp.market.dao.entity.Author;\r\nimport ru.learnUp.market.dao.entity.Book;\r\nimport ru.learnUp.market.dao.repository.BookRepository;\r\n\r\nimport java.util.List;\r\n\r\n@Service\r\npublic class BookService {\r\n    private BookRepository bookRepository;\r\n\r\n    public BookService(BookRepository bookRepository) {\r\n        this.bookRepository = bookRepository;\r\n    }\r\n\r\n    public Book createBook(Book book) {\r\n        return bookRepository.save(book);\r\n    }\r\n\r\n    public List<Book> getBooks (){\r\n        return bookRepository.findAll();\r\n    }\r\n\r\n    public Book getBookId(Long id){\r\n        return bookRepository.getById(id);\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/service/BookService.java b/src/main/java/ru/learnUp/market/dao/service/BookService.java
+--- a/src/main/java/ru/learnUp/market/dao/service/BookService.java	
++++ b/src/main/java/ru/learnUp/market/dao/service/BookService.java	
+@@ -1,7 +1,6 @@
+ package ru.learnUp.market.dao.service;
+ 
+ import org.springframework.stereotype.Service;
+-import ru.learnUp.market.dao.entity.Author;
+ import ru.learnUp.market.dao.entity.Book;
+ import ru.learnUp.market.dao.repository.BookRepository;
+ 
+@@ -9,7 +8,7 @@
+ 
+ @Service
+ public class BookService {
+-    private BookRepository bookRepository;
++    private final BookRepository bookRepository;
+ 
+     public BookService(BookRepository bookRepository) {
+         this.bookRepository = bookRepository;
+Index: src/main/java/ru/learnUp/market/BooksShopApplication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.learnUp.market;\r\n\r\nimport lombok.extern.slf4j.Slf4j;\r\nimport org.slf4j.Logger;\r\nimport org.slf4j.LoggerFactory;\r\nimport org.springframework.boot.SpringApplication;\r\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\r\nimport org.springframework.context.ConfigurableApplicationContext;\r\nimport ru.learnUp.market.dao.service.AuthorService;\r\nimport ru.learnUp.market.dao.service.BookService;\r\nimport ru.learnUp.market.dao.service.CustomerService;\r\n//import ru.learnUp.market.dao.AuthorDao;\r\n\r\nimport java.time.LocalDate;\r\n\r\n\r\n@SpringBootApplication\r\npublic class BooksShopApplication {\r\n\r\n    private static final Logger log = LoggerFactory.getLogger(BooksShopApplication.class);\r\n\r\n    public static void main(String[] args) {\r\n\r\n        ConfigurableApplicationContext context = SpringApplication.run(BooksShopApplication.class, args);\r\n\r\n        AuthorService authorService = context.getBean(AuthorService.class);\r\n        BookService bookService = context.getBean(BookService.class);\r\n        CustomerService customerService = context.getBean(CustomerService.class);\r\n\r\n        log.info(\"Author {}\", authorService.getAuthors());\r\n        log.info(\"Book {}\", bookService.getBooks());\r\n        log.info(\"Customer {}\", customerService.getCustomers());\r\n//        Author forUpdate = Author.builder()\r\n//                .author_name(\"William\")\r\n//                .author_surname(\"Shakespeare\")\r\n//                .birth_date(LocalDate.of(1564, 4, 26))\r\n//                .build();\r\n//\r\n//        AuthorDao authorDao = context.getBean(AuthorDao.class);\r\n//        authorDao.save(forUpdate);\r\n//\r\n//        Author author = authorDao.findById(1);\r\n//        log.info(\"{}\", author);\r\n    }\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/BooksShopApplication.java b/src/main/java/ru/learnUp/market/BooksShopApplication.java
+--- a/src/main/java/ru/learnUp/market/BooksShopApplication.java	
++++ b/src/main/java/ru/learnUp/market/BooksShopApplication.java	
+@@ -1,6 +1,5 @@
+ package ru.learnUp.market;
+ 
+-import lombok.extern.slf4j.Slf4j;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.springframework.boot.SpringApplication;
+@@ -9,9 +8,7 @@
+ import ru.learnUp.market.dao.service.AuthorService;
+ import ru.learnUp.market.dao.service.BookService;
+ import ru.learnUp.market.dao.service.CustomerService;
+-//import ru.learnUp.market.dao.AuthorDao;
+ 
+-import java.time.LocalDate;
+ 
+ 
+ @SpringBootApplication
+@@ -27,20 +24,7 @@
+         BookService bookService = context.getBean(BookService.class);
+         CustomerService customerService = context.getBean(CustomerService.class);
+ 
+-        log.info("Author {}", authorService.getAuthors());
+-        log.info("Book {}", bookService.getBooks());
+-        log.info("Customer {}", customerService.getCustomers());
+-//        Author forUpdate = Author.builder()
+-//                .author_name("William")
+-//                .author_surname("Shakespeare")
+-//                .birth_date(LocalDate.of(1564, 4, 26))
+-//                .build();
+-//
+-//        AuthorDao authorDao = context.getBean(AuthorDao.class);
+-//        authorDao.save(forUpdate);
+-//
+-//        Author author = authorDao.findById(1);
+-//        log.info("{}", author);
++        log.info("Author {}", authorService.getAuthorId(1L));
+     }
+ 
+ }

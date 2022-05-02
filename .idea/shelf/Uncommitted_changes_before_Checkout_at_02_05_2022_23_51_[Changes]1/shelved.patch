@@ -1,0 +1,130 @@
+Index: src/main/java/ru/learnUp/market/dao/BooksDao.java
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/BooksDao.java b/src/main/java/ru/learnUp/market/dao/BooksDao.java
+deleted file mode 100644
+--- a/src/main/java/ru/learnUp/market/dao/BooksDao.java	
++++ /dev/null	
+@@ -1,36 +0,0 @@
+-package ru.learnUp.market.dao;
+-//
+-//import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+-//import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+-//import org.springframework.stereotype.Repository;
+-//
+-//
+-//@Repository
+-//public class BooksDao {
+-//
+-//    private static final String FIND_BY_ID = "select * from books_shop where book_id = :book_id";
+-//    private static final String SAVE = "insert into books_shop where book_name values = :book_name";
+-//    private final NamedParameterJdbcTemplate template;
+-//
+-//    public BooksDao(NamedParameterJdbcTemplate template) {
+-//        this.template = template;
+-//    }
+-//
+-//    public Book findById(long id) {
+-//        return template.query(FIND_BY_ID,
+-//                        new MapSqlParameterSource("id", id),
+-//                        (rs, rn) -> Book.builder()
+-//                                .author_id(rs.getLong("id"))
+-//                                .book_id(rs.getLong("book_id"))
+-//                                .book_name(rs.getString("book_name"))
+-//                                .build()
+-//                ).stream()
+-//                .findAny()
+-//                .orElseThrow(() -> new RuntimeException("book with this id - " + id + " - is not found"));
+-//    }
+-//
+-//    public void save(Book book) {
+-//        template.update(SAVE, new MapSqlParameterSource()
+-//                        .addValue("author_name", book.getBook_name()));
+-//    }
+-//}
+Index: src/main/java/ru/learnUp/market/dao/OrderDao.java
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/OrderDao.java b/src/main/java/ru/learnUp/market/dao/OrderDao.java
+deleted file mode 100644
+--- a/src/main/java/ru/learnUp/market/dao/OrderDao.java	
++++ /dev/null	
+@@ -1,7 +0,0 @@
+-////package ru.learnUp.market.dao;
+-////
+-////import org.springframework.stereotype.Repository;
+-////
+-////@Repository
+-////public class OrderDao {
+-//}
+Index: src/main/java/ru/learnUp/market/dao/AuthorDao.java
+===================================================================
+diff --git a/src/main/java/ru/learnUp/market/dao/AuthorDao.java b/src/main/java/ru/learnUp/market/dao/AuthorDao.java
+deleted file mode 100644
+--- a/src/main/java/ru/learnUp/market/dao/AuthorDao.java	
++++ /dev/null	
+@@ -1,49 +0,0 @@
+-//package ru.learnUp.market.dao;
+-//
+-//import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+-//import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+-//import org.springframework.stereotype.Repository;
+-//
+-//import java.time.ZoneOffset;
+-//import java.sql.Date;
+-//
+-//@Repository
+-//public class AuthorDao {
+-
+-//    private static final String FIND_BY_ID = "select * from author where author_id = :author_id";
+-//    private static final String SAVE = "insert into author (author_name, author_surname, birth_date) " +
+-//            "values (:author_name, :author_surname, :birth_date)";
+-//    private final NamedParameterJdbcTemplate template;
+-//
+-//    public AuthorDao(NamedParameterJdbcTemplate template) {
+-//        this.template = template;
+-//    }
+-//
+-//    public Author findById(long id) {
+-//        return template.query(FIND_BY_ID,
+-//                        new MapSqlParameterSource("author_id", id),
+-//                        (rs, rn) -> Author.builder()
+-//                                .author_id(rs.getLong("author_id"))
+-//                                .author_name(rs.getString("author_name"))
+-//                                .author_surname(rs.getString("author_surname"))
+-//                                .birth_date(rs.getDate("birth_date").toLocalDate())
+-//                                .build()
+-//                ).stream()
+-//                .findAny()
+-//                .orElseThrow(() -> new RuntimeException("author with this id - " + id + " - is not found"));
+-//    }
+-//
+-//    public void save(Author author) {
+-//        template.update(SAVE,
+-//                new MapSqlParameterSource()
+-//                        .addValue("author_name", author.getAuthor_name())
+-//                        .addValue("author_surname", author.getAuthor_surname())
+-//                        .addValue("birth_date", new Date(author.getBirth_date()
+-//                                        .atStartOfDay()
+-//                                        .toInstant(ZoneOffset.UTC)
+-//                                        .toEpochMilli()
+-//                                )
+-//                        )
+-//        );
+-//    }
+-//}
+Index: .idea/jpa-buddy.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/jpa-buddy.xml b/.idea/jpa-buddy.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/jpa-buddy.xml	
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="JpaBuddyIdeaProjectConfig">
++    <option name="defaultUnitInitialized" value="true" />
++  </component>
++</project>
+\ No newline at end of file
